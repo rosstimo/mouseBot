@@ -32,8 +32,9 @@ int timeOut = 60000;  // maximum time in microseconds to wait for valid measurem
 
 bool debug = false;  //measure method writes to serial when true TODO toggle on button
 
-int globalmax = 100;  // largest distance in cm that we care about. don't indicate above this distance
-int threshold = 25;   // distance in cm that is considered close. indicate green above red below
+int globalmax = 100;             // largest distance in cm that we care about. don't indicate above this distance
+int threshold = 25;              // distance in cm that is considered close. indicate green above red below
+String indicatorStatus = "OFF";  // holds current LED status
 
 void setup() {
   // initialize serial communication:
@@ -89,7 +90,6 @@ void loop() {
     pollCycle = millis() - startTime;
   } while (pollCycle <= pollingTime && pollCycle >= 0);
   checkModeButton();
-  Serial.println(debug);
 }
 
 // a short (~10us) pulse will initiate a new measurement cycle
@@ -111,9 +111,6 @@ bool echoPinState(int echoPin) {
 long measure(int echoPin, int triggerPin) {
   sendPing(triggerPin);
   long pulseDuration = pulseIn(echoPin, HIGH);
-  if (debug == true) {
-    sendSerial(pulseDuration);
-  }
   return pulseDuration;
 }
 
@@ -135,37 +132,50 @@ void indicate(int Green_LED, int Red_LED, int distance, int threshold) {
   if (distance <= threshold) {
     digitalWrite(Green_LED, LOW);
     digitalWrite(Red_LED, HIGH);
+    indicatorStatus = "RED";
   } else if (distance >= globalmax) {
     digitalWrite(Green_LED, LOW);
     digitalWrite(Red_LED, LOW);
+    indicatorStatus = "OFF";
   } else {
     digitalWrite(Green_LED, HIGH);
     digitalWrite(Red_LED, LOW);
+    indicatorStatus = "GREEN";
   }
 }
 
 // write values to serial port
-void sendSerial(long duration) {
-  Serial.print(in(duration));
-  Serial.print("in, ");
-  Serial.print(cm(duration));
-  Serial.print("cm");
+void sendSerial(long duration, String description) {
+  Serial.println("***   " + description + "   ***");
+  Serial.println("Echo PW: " + String(duration) + "us");
+  Serial.println("Distance: " + String(in(duration)) + "in");
+  Serial.println("Distance: " + String(cm(duration)) + "cm");
+  Serial.println("LED: " + indicatorStatus);
   Serial.println();
 }
 
 void front() {
   long duration = measure(frontEchoPin, frontTrigPin);
   indicate(front_Green_LED, front_Red_LED, cm(duration), threshold);
+  if (debug == true) {
+    sendSerial(duration, "Front Sensor");
+  }
 }
 
 void left() {
   long duration = measure(leftEchoPin, leftTrigPin);
   indicate(left_Green_LED, left_Red_LED, cm(duration), threshold);
+  if (debug == true) {
+    sendSerial(duration, "Left Sensor");
+  }
 }
 
 void right() {
   long duration = measure(rightEchoPin, rightTrigPin);
   indicate(right_Green_LED, right_Red_LED, cm(duration), threshold);
+  if (debug == true) {
+    sendSerial(duration, "Right Sensor");
+  }
 }
 
 // buzzer on 100ms off 100ms
@@ -195,5 +205,4 @@ void checkModeButton() {
   if (debug == true) {
     beep();
   }
-  //delay(pollingTime);
 }
