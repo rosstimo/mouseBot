@@ -2,20 +2,22 @@
 
 // define sensor pin variable. duplicate or remove as needed
 const int frontTrigPin = 2;
-const int leftTrigPin = 3;
-const int rightTrigPin = 4;
+const int frontEchoPin = 3;
+const int front_Red_LED = 4;
+const int front_Green_LED = 5;
 
-const int frontEchoPin = 5;
-const int leftEchoPin = 6;
-const int rightEchoPin = 7;
+const int leftTrigPin = 6;
+const int leftEchoPin = 7;
+const int left_Red_LED = 8;
+const int left_Green_LED = 9;
 
-const int front_Red_LED = 8;
-const int left_Red_LED = 9;
-const int right_Red_LED = 10;
-
-const int front_Green_LED = 11;
-const int left_Green_LED = 12;
+const int rightTrigPin = 10;
+const int rightEchoPin = 11;
+const int right_Red_LED = 12;
 const int right_Green_LED = 13;
+
+// 
+const int mode_select_button = A0; // A0 is used as digital pin 14
 
 /* 
    microseconds since power on. 
@@ -55,6 +57,9 @@ void setup() {
   pinMode(left_Red_LED, OUTPUT);
   pinMode(right_Green_LED, OUTPUT);
   pinMode(right_Red_LED, OUTPUT);
+
+  // button inputs
+  pinMode(mode_select_button, INPUT);
 }
 
 void loop() {
