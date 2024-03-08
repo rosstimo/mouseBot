@@ -1,5 +1,26 @@
 //see: https://www.handsontec.com/dataspecs/HC-SR04-Ultrasonic.pdf
 
+        /*
+
+   TX   --|D0/TX     VIN|<-   +5V
+   RX   --|D1/RX     GND|--   GND
+        --|RST       RST|--
+   GND  --|GND        5V|->
+   FT   --|D2     D21/A7|--   Button+
+   FE   --|D3~    D20/A6|--   Buzz+
+   FG   --|D4     D19/A5|--   SCL
+   MR   --|D5~    D18/A4|--   SDA
+   ML   --|D6~    D17/A3|--   LG
+   FR   --|D7     D16/A2|--   LR
+   RT   --|D8     D15/A1|--   LE
+   MR   --|D9~    D14/A0|--   LT
+   MF   --|D10~     AREF|--   
+   RE   --|D11~     3.3V|->
+   RR   --|D12       D13|--   RG
+
+        */
+
+
 // define sensor pin variable. duplicate or remove as needed
 const int frontTrigPin = 2;
 const int frontEchoPin = 3;
