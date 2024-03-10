@@ -1,7 +1,7 @@
 # Non-blocking code for Arduino
 
-## Perplexity Playground Model: codellama-70b-instruct
-### Prmompt 3-10-2024 0700:
+### Perplexity Playground Model: codellama-70b-instruct
+### Prompt 3-10-2024 0700:
 I'm using Arduino to control up to 8 devices. I need to turn them on and off asynchronously and possibly simultaneously. each device will have a "state" and duration with resolution in microseconds. needs to be non blocking and can't use interrupts. output full code example
 LLM served by Perplexity Labs
 ### Response:
