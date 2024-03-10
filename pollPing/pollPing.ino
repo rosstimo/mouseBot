@@ -21,7 +21,7 @@
         */
 
 
-// define sensor pin variable. duplicate or remove as needed
+// define sensor pin and LED indicatior pins. duplicate or remove as needed.
 const int frontTrigPin = 2;
 const int frontEchoPin = 3;
 const int front_Red_LED = 5;
@@ -37,9 +37,21 @@ const int rightEchoPin = 11;
 const int right_Red_LED = 12;
 const int right_Green_LED = 13;
 
-//
-const int mode_select_button = A7;  // A7 is used as digital pin 21
-const int buzzerPin = A6;           // A6 is used as digital pin 20
+const int motorForward = 10;   
+const int motorReverse = 9;
+const int motorLeft = 6;
+const int motorRight = 5;
+
+//button used to toggle mode
+const int mode_select_button = 21;  // A7 is used as digital pin 21
+
+//active buzzer for audible indications
+const int buzzerPin = 20;           // A6 is used as digital pin 20
+
+// setup i2c for communication with other devices
+#include <Wire.h>
+
+
 
 /* 
    microseconds since power on. 
@@ -49,7 +61,9 @@ const int buzzerPin = A6;           // A6 is used as digital pin 20
 long time = micros();
 long pollingTime = 1000;
 
-int timeOut = 60000;  // maximum time in microseconds to wait for valid measurement
+// maximum time in microseconds to wait for valid measurement
+// 38ms is the maximum time it takes for the echo pin to go low after the trigger pin goes high if no echo is received. TODO verify
+int timeOut = 60000;  
 
 bool debug = false;  //measure method writes to serial when true TODO toggle on button
 
@@ -59,7 +73,7 @@ String indicatorStatus = "OFF";  // holds current LED status
 
 void setup() {
   // initialize serial communication:
-  Serial.begin(9600);
+  Serial.begin(9600); //TODO increase to 115200 for faster communication
 
 
   //set up trigger pins as outputs
@@ -89,6 +103,14 @@ void setup() {
   // active buzzer for audible indication of mode
   pinMode(buzzerPin, OUTPUT);
 
+  // motor control pins
+  pinMode(motorForward, OUTPUT);
+  pinMode(motorReverse, OUTPUT);
+  pinMode(motorLeft, OUTPUT);
+  pinMode(motorRight, OUTPUT);
+
+
+
   beep();
   beep();
   beep();
@@ -99,7 +121,7 @@ void loop() {
   long startTime = millis();
   long pollCycle = 0;
   do {
-    // example polling pattern
+    // example polling pattern TODO poling pattern to array
     // measure front
     front();
     // measure right
@@ -165,7 +187,7 @@ void indicate(int Green_LED, int Red_LED, int distance, int threshold) {
   }
 }
 
-// write values to serial port
+// write values to serial port TODO shorten to comma seperated packet. 
 void sendSerial(long duration, String description) {
   Serial.println("***   " + description + "   ***");
   Serial.println("Echo PW: " + String(duration) + "us");
@@ -199,7 +221,7 @@ void right() {
   }
 }
 
-// buzzer on 100ms off 100ms
+// buzzer on 100ms off 100ms //TODO use micros to avoid blocking
 void beep() {
   digitalWrite(buzzerPin, HIGH);
   delay(100);
@@ -225,5 +247,83 @@ void checkModeButton() {
 
   if (debug == true) {
     beep();
+  }
+}
+
+
+// motor control
+
+void Forward() {
+  digitalWrite(motorForward, HIGH);
+  digitalWrite(motorReverse, LOW);
+}
+
+void Reverse() {
+  digitalWrite(motorForward, LOW);
+  digitalWrite(motorReverse, HIGH);
+}
+
+void Left() {
+  digitalWrite(motorLeft, HIGH);
+  digitalWrite(motorRight, LOW);
+}
+
+void Right() {
+  digitalWrite(motorLeft, LOW);
+  digitalWrite(motorRight, HIGH);
+}
+
+void Straight() {
+  digitalWrite(motorLeft, LOW);
+  digitalWrite(motorRight, LOW);
+}
+
+void Stop() {
+  digitalWrite(motorForward, LOW);
+  digitalWrite(motorReverse, LOW);
+  digitalWrite(motorLeft, LOW);
+  digitalWrite(motorRight, LOW);
+}
+
+// get heading from compass TODO verify
+long getHeading() {
+  Wire.beginTransmission(0x1E); // transmit to device 0x1E
+  Wire.write(0x03);              // sends one byte
+  Wire.endTransmission();        // stop transmitting
+
+  Wire.requestFrom(0x1E, 2);      // request 2 bytes from slave device 0x1E
+
+  if (Wire.available() == 2) { // if two bytes were received
+    int MSB = Wire.read();
+    int LSB = Wire.read();
+    return ((MSB << 8) + LSB) / 10;
+  }
+  return 0;
+}
+
+// set heading for forward travel
+void setHeading(int heading) {
+  //TODO
+}
+
+// a timer function that returns true if the time in microseconds has expired
+// takes start time and duration in microseconds. handles rollover of micros()
+bool timeExpiredMicros(long start, long duration) {
+  long now = micros();
+  if (now < start) {
+    return (now + (0xFFFFFFFF - start) > duration);//TODO verify
+  } else {
+    return (now - start > duration);
+  }
+}
+ 
+// a timer function that returns true if the time in miliseconds has expired
+// takes start time and duration in microseconds. handles rollover of millis()
+bool timeExpiredMillis(long start, long duration) {
+  long now = millis();
+  if (now < start) {
+    return (now + (0xFFFFFFFF - start) > duration);//TODO verify
+  } else {
+    return (now - start > duration);
   }
 }
