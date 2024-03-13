@@ -21,7 +21,9 @@
 make sure pins are not connected to any power
 or GND  before programming to avoid damage
 */
+
 void setup() {
+  // put your setup code here, to run once:
   pinMode(0, OUTPUT);
   pinMode(1, OUTPUT);
   pinMode(2, OUTPUT);
@@ -44,13 +46,28 @@ void setup() {
   pinMode(19, OUTPUT);
   pinMode(20, OUTPUT);
   pinMode(21, OUTPUT);
-  
+
 }
 
-void loop(){
-// toggle all pins every 250 milliseconds
+void loop() {
+/* run testPatternAllOn 8 times
+  for(int i=0; i<=7; i++){
+    testPatternAllOn();
+  }
+*/
 
-for(int i=0; i<=21; i++){
+// run testPatternAlternate 8 times
+  for(int i=0; i<=7; i++){
+    testPatternAlternate();
+  }
+
+
+}
+
+// test pattern all pins on
+// toggle all pins every 250 milliseconds
+void testPatternAllOn(){
+  for(int i=0; i<=21; i++){
     digitalWrite(i, HIGH);
   }
   delay(250);
@@ -59,3 +76,24 @@ for(int i=0; i<=21; i++){
   }
   delay(250);
 }
+
+// test pattern alternate between off and even pins
+void testPatternAlternate(){
+  for(int i=0; i<=21; i++){
+    if(i%2==0){
+      digitalWrite(i, HIGH);
+    }else{
+      digitalWrite(i, LOW);
+    }
+  }
+  delay(250);
+  for(int i=0; i<=21; i++){
+    if(i%2==0){
+      digitalWrite(i, LOW);
+    }else{
+      digitalWrite(i, HIGH);
+    }
+  }
+  delay(250);
+}
+ 

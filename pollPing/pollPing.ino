@@ -6,8 +6,8 @@
    RX   --|D1/RX     GND|--   GND
         --|RST       RST|--
    GND  --|GND        5V|->
-   FT   --|D2     D21/A7|--   Button+
-   FE   --|D3~    D20/A6|--   Buzz+
+   FT   --|D2     D21/A7|--   Buzz+
+   FE   --|D3~    D20/A6|--   Button+
    FG   --|D4     D19/A5|--   SCL
    MR   --|D5~    D18/A4|--   SDA
    ML   --|D6~    D17/A3|--   LG
@@ -24,13 +24,13 @@
 // define sensor pin and LED indicatior pins. duplicate or remove as needed.
 const int frontTrigPin = 2;
 const int frontEchoPin = 3;
-const int front_Red_LED = 5;
+const int front_Red_LED = 7;
 const int front_Green_LED = 4;
 
-const int leftTrigPin = 14;
-const int leftEchoPin = 15;
-const int left_Red_LED = 16;
-const int left_Green_LED = 17:
+const int leftTrigPin = A0;
+const int leftEchoPin = A1;
+const int left_Red_LED = A2;
+const int left_Green_LED = A3;
 
 const int rightTrigPin = 8; 
 const int rightEchoPin = 11;
@@ -43,10 +43,10 @@ const int motorLeft = 6;
 const int motorRight = 5;
 
 //button used to toggle mode
-const int mode_select_button = 21;  // A7 is used as digital pin 21
+const int mode_select_button = A6;  // A6 is used as digital pin 20
 
 //active buzzer for audible indications
-const int buzzerPin = 20;           // A6 is used as digital pin 20
+const int buzzerPin = A7;           // A7 is used as digital pin 21
 
 // setup i2c for communication with other devices
 #include <Wire.h>
@@ -132,7 +132,7 @@ void loop() {
     left();
     pollCycle = millis() - startTime;
   } while (pollCycle <= pollingTime && pollCycle >= 0);
-  checkModeButton();
+  //checkModeButton();
 }
 
 // a short (~10us) pulse will initiate a new measurement cycle
